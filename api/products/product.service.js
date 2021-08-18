@@ -1,45 +1,54 @@
 
-const productRepository=require('./product.repository')
-const utilsService=require('../../services/utils.service')
+const productRepository = require('./product.repository')
+const utilsService = require('../../services/utils.service')
+const errorHandler = require('../../services/error.handler')
 
 async function createProduct(productToCreate) {
-       return await productRepository.createProduct(productToCreate)
-       
+    return await productRepository.createProduct(productToCreate)
 }
 
 async function getProductById(productId) {
-        return await productRepository.getProductById(productId)
+    const product = await productRepository.getProductById(productId)
+    if (!product) errorHandler.entityNotFound(productId)
+    return product
 }
 
 async function queryProducts(criteria = {}) {
-    if(!_isValidateCriteria(criteria))return Error('invalid query') 
+    validateCriteria(criteria)
     return await productRepository.queryProducts(criteria)
 }
 
 async function updateProduct(product) {
-   return await productRepository.updateProduct(product)
+    const res=await productRepository.updateProduct(product)
+    validateResponse(res)
+    return res
 }
 
-async function patchManyProducts(patch){
-  return await productRepository.patchProducts(patch)
+async function patchManyProducts(patch) {
+    const res=await productRepository.patchProducts(patch)
+    validateResponse(res)
+    return res
 }
 async function removeProductById(productId) {
-    const res=await productRepository.removeProductById(productId)
-    if(!res)throw Error ('product not found in db')
-    
+    const res = await productRepository.removeProductById(productId)
+    if (!res) errorHandler.entityNotFound(productId)
+
 }
-async function removeManyProductsById(productIds){
-    const result=await productRepository.removeManyProducts(productIds)
+async function removeManyProductsById(productIds) {
+    const res = await productRepository.removeManyProducts(productIds)
     // await collectionService.removeProductFromAllCollections(productIds)
-   return result
-    
+    validateResponse(res)
+    return res
+
 }
-async function _isValidateCriteria(criteria){
-    const allowedFilters=['skip','sort','limit','status','vendor','type','tags']
-    for(let key in criteria){
-        if(!allowedFilters.includes(key))return false
-    }
-    return true
+function validateCriteria(criteria) {
+    const allowedFilters = ['skip', 'sort', 'limit', 'status', 'vendor', 'type', 'tags']
+     const isValid= Object.entries(criteria)
+            .every(entry=> allowedFilters.includes(entry[0]))
+    if(!isValid) errorHandler.invalidParams(criteria)
+}
+function validateResponse(res){
+    console.log('VALIDATE RESPONSE IS:',res)
 }
 
 
