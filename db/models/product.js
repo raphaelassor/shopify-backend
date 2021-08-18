@@ -30,9 +30,14 @@ const productSchema = new mongoose.Schema({
     price: {
         type: Number,
         required: true,
+        min:[0,'Price cannot be negative!']
+        
+
     },
     sku: {
         type: String,
+        maxLength:30,
+        trim:true
     },
     status: {
         type: String,
@@ -64,48 +69,14 @@ const productSchema = new mongoose.Schema({
     },
     weight: {
         value: Number,
-        unit: ""
+        unit: {
+            enum:['LB','KG']
+        }
     },
 
 }, {
     timestamps: true,
 })
-
-// productSchema.virtual('tasks', {
-//     ref: 'Task',
-//     localField: '_id',
-//     foreignField: 'owner'
-// })
-
-// productSchema.methods.toJSON = function () {
-//     const product = this
-//     const productObject = product.toObject()
-
-//     delete productObject.password
-//     delete productObject.tokens
-//     delete productObject.avatar
-
-//     return productObject
-// }
-
-
-// // Hash the plain text password before saving
-// productSchema.pre('save', async function (next) {
-//     const product = this
-
-//     if (product.isModified('password')) {
-//         product.password = await bcrypt.hash(product.password, 8)
-//     }
-
-//     next()
-// })
-
-// // Delete product tasks when product is removed
-// productSchema.pre('remove', async function (next) {
-//     const product = this
-//     await Task.deleteMany({ owner: product._id })
-//     next()
-// })
 
 const Product = mongoose.model('Product', productSchema)
 

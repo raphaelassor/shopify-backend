@@ -1,5 +1,4 @@
 const mongoose = require('mongoose')
-const Product =require('./models/product')
 mongoose.connect('mongodb+srv://raphaelassor:Rpi2581998!@cluster0.cjqk3.mongodb.net/shopify', {
     useNewUrlParser: true,
     useCreateIndex: true,

@@ -1,7 +1,8 @@
 const Product = require('../../db/models/product')
 const logger = require('../../services/logger.service')
-const mongoUtil=require('../../db/mongoUtil')
+const dbUtil=require('../../db/dbUtil')
 const errorHandler=require('../../services/error.handler')
+const appSettings=require('../../services/app.settings')
 
 async function createProduct(productToSave) {
     try {
@@ -14,19 +15,15 @@ async function createProduct(productToSave) {
 
 async function getProductById(productId) {
     try {
-        const product = await Product.findById(productId)
-        return product
+        return await Product.findById(productId)
     } catch (err) {
         errorHandler.dbActionFailed('GET',productId,err)
     }
 }
 
 async function queryProducts(criteria) {
-    mongoUtil.noramilzeCriteria(criteria)
-    const match = mongoUtil.getMongoMatch(criteria)
-    const sort =  mongoUtil.parseSort(criteria.sort)
-    const limit = criteria.limit || 25
-    const skip = criteria.skip || 0
+    const queryCriteria=dbUtil.buildCriteriaForQuery(criteria)
+    const {limit,skip,sort,match}=queryCriteria
     try {
         const products = await Product.find(match)
             .limit(limit)
@@ -49,7 +46,7 @@ async function updateProduct(product) {
 
 async function patchProducts(patch) {
     try {
-        const command = mongoUtil.getMongoPatchCommand(patch)
+        const command = dbUtil.parsePatchCommand(patch)
         const pathcedProducts = await Product.updateMany({ _id: { $in: patch.ids } }, command, { new: true, runValidators: true })
         return pathcedProducts
     } catch (err) {

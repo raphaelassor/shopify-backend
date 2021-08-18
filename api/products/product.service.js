@@ -2,6 +2,7 @@
 const productRepository = require('./product.repository')
 const utilsService = require('../../services/utils.service')
 const errorHandler = require('../../services/error.handler')
+const appSettings=require('../../services/app.settings')
 
 async function createProduct(productToCreate) {
     return await productRepository.createProduct(productToCreate)
@@ -42,13 +43,14 @@ async function removeManyProductsById(productIds) {
 
 }
 function validateCriteria(criteria) {
-    const allowedFilters = ['skip', 'sort', 'limit', 'status', 'vendor', 'type', 'tags']
+    const allowedOptions = appSettings.PRODUCT_FILTER_OPTIONS
      const isValid= Object.entries(criteria)
-            .every(entry=> allowedFilters.includes(entry[0]))
+            .every(entry=> allowedOptions.includes(entry[0]))
     if(!isValid) errorHandler.invalidParams(criteria)
 }
 function validateResponse(res){
-    console.log('VALIDATE RESPONSE IS:',res)
+   
+    //NEED TO DO VALIDATION FOR RESPONSE 
 }
 
 
